@@ -25,7 +25,7 @@ module KibanaConfig
   Type = '<%= node['kibana']['conf']['type'] %>'
 
   # Results to show per page
-  Per_page = <%= node['kibana']['conf']['resuls_per_page'] %>
+  Per_page = <%= node['kibana']['conf']['results_per_page'] %>
 
   # Timezone. Leave this set to 'user' to have the user's browser autocorrect.
   # Otherwise, set a timezone string
@@ -80,7 +80,7 @@ module KibanaConfig
   # Delimit exported file fields with what?
   # You may want to change this to something like "\t" (tab) if you have
   # commas in your logs
-  Export_delimiter = <%= node['kibana']['conf']['export_delimiter'] %>
+  Export_delimiter = '<%= node['kibana']['conf']['export_delimiter'] %>'
 
   # You may wish to insert a default search which all user searches
   # must match. For example @source_host:www1 might only show results
