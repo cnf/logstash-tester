@@ -38,12 +38,10 @@ Vagrant::Config.run do |config|
         logstash: {
           confdir: '/vagrant/config',
           log_dir: '/vagrant/logs/',
-          server: {
-            version: '1.1.9',
-            debug: true,
-            xms: '128m',
-            xmx: '128m',
-          }
+          version: '1.1.9',
+          debug: true,
+          xms: '128m',
+          xmx: '128m',
         }
       }
   end
