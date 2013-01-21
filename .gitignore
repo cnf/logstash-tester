@@ -1,0 +1,4 @@
+fabfile.py
+.vagrant
+/config/*
+/logs/*
