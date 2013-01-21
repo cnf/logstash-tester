@@ -1,0 +1,70 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          logstash-shipper
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+mode="server"
+name="logstash-$mode"
+logstash_bin="/usr/bin/java -- -Xmx<%= node['logstash']['server']['xmx'] %> -Xms<%= node['logstash']['server']['xms'] %> <%= node['logstash']['server']['java_opts'] %> <%= node['logstash']['server']['gc_opts'] %> -jar /opt/logstash/logstash-server.jar"
+logstash_conf="<%= node['logstash']['confdir'] %>/conf.d/"
+logstash_log="<%= node['logstash']['log_dir'] %>/$name.log"
+pid_file="<%= node['logstash']['pid_dir'] %>/$name.pid"
+runas="<%= node['logstash']['user'] %>:<%= node['logstash']['group'] %>"
+
+NICE_LEVEL="-n 19"
+
+start () {
+command="/usr/bin/nice ${NICE_LEVEL} ${logstash_bin} agent <% if node['logstash']['server']['debug'] -%>-v<% end -%> -f $logstash_conf --log ${logstash_log}"
+
+    log_daemon_msg "Starting $mode" "$name"
+    ulimit -n 4096
+    if start-stop-daemon --start -c $runas --quiet --oknodo --pidfile "$pid_file" -b -m --exec $command; then
+        log_end_msg 0
+    else
+        log_end_msg 1
+    fi
+}
+
+stop () {
+    start-stop-daemon --stop --quiet --oknodo --pidfile "$pid_file"
+}
+
+status () {
+    status_of_proc -p $pid_file "" "$name"
+}
+
+case $1 in
+    start)
+        if status; then exit 0; fi
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    reload)
+        stop
+        start
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    status)
+        status && exit 0 || exit $?
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+        ;;
+esac
+
+exit 0
